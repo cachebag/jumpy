@@ -1,0 +1,93 @@
+local M = {}
+
+M.config = {
+  provider = "openrouter",
+  endpoint = nil,
+  model = nil,
+  api_key = nil,
+  system_prompt = [[You are a code editor. The user will give you a file and an instruction. Return ONLY the complete modified file contents. Do not wrap in markdown code fences. Do not explain.]],
+  keymaps = {
+    prompt = "<leader>j",
+    next_hunk = "]h",
+    prev_hunk = "[h",
+    accept = "<leader>a",
+    reject = "<leader>x",
+    accept_all = "<leader>A",
+    reject_all = "<leader>X",
+    reprompt = "<leader>r",
+  },
+  highlights = {
+    added = "JumpyAdded",
+    removed = "JumpyRemoved",
+  },
+}
+
+local provider_defaults = {
+  openrouter = {
+    endpoint = "https://openrouter.ai/api/v1/chat/completions",
+    model = "openai/gpt-4o",
+    env_key = "JUMPY_API_KEY",
+  },
+  openai = {
+    endpoint = "https://api.openai.com/v1/chat/completions",
+    model = "gpt-4o",
+    env_key = "OPENAI_API_KEY",
+  },
+  anthropic = {
+    endpoint = "https://api.anthropic.com/v1/messages",
+    model = "claude-sonnet-4-6",
+    env_key = "ANTHROPIC_API_KEY",
+  },
+}
+
+function M.setup(opts)
+  M.config = vim.tbl_deep_extend("force", M.config, opts or {})
+
+  local p = provider_defaults[M.config.provider]
+  if p then
+    M.config.endpoint = M.config.endpoint or p.endpoint
+    M.config.model = M.config.model or p.model
+    if not M.config.api_key then
+      M.config.api_key = vim.env[p.env_key] or vim.env.JUMPY_API_KEY
+    end
+  else
+    if not M.config.api_key then
+      M.config.api_key = vim.env.JUMPY_API_KEY
+    end
+  end
+
+  M._setup_highlights()
+  M._setup_keymaps()
+end
+
+function M.auto_setup()
+  M._setup_highlights()
+  vim.api.nvim_create_user_command("Jumpy", function()
+    require("jumpy.prompt").open()
+  end, { desc = "Open Jumpy prompt" })
+end
+
+function M._setup_highlights()
+  local hl = vim.api.nvim_set_hl
+  hl(0, "JumpyAdded", { bg = "#1a3a1a", default = true })
+  hl(0, "JumpyRemoved", { bg = "#3a1a1a", strikethrough = true, default = true })
+  hl(0, "JumpyAddedSign", { fg = "#4ec94e", default = true })
+  hl(0, "JumpyRemovedSign", { fg = "#e05252", default = true })
+end
+
+function M._setup_keymaps()
+  local map = vim.keymap.set
+  local opts = { silent = true }
+  local c = M.config.keymaps
+
+  map("n", c.prompt, function() require("jumpy.prompt").open() end, opts)
+  map("n", c.next_hunk, function() require("jumpy.navigate").next_hunk() end, opts)
+  map("n", c.prev_hunk, function() require("jumpy.navigate").prev_hunk() end, opts)
+  map("n", c.accept, function() require("jumpy.navigate").accept() end, opts)
+  map("n", c.reject, function() require("jumpy.navigate").reject() end, opts)
+  map("n", c.accept_all, function() require("jumpy.navigate").accept_all() end, opts)
+  map("n", c.reject_all, function() require("jumpy.navigate").reject_all() end, opts)
+  map("n", c.reprompt, function() require("jumpy.prompt").reprompt() end, opts)
+end
+
+return M
