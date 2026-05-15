@@ -2,6 +2,8 @@
 
 honestly just fucking around idk what im doing
 
+this really doesn't work very well 
+
 ## Install
 
 ```lua
