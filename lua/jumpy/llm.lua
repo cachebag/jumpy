@@ -125,9 +125,11 @@ local function make_request(messages, callback)
   local response_chunks = {}
   local stderr_chunks = {}
   local loading = require("jumpy.loading")
+  local cancelled = false
   loading.start()
 
-  local jid = vim.fn.jobstart(cmd, {
+  local jid
+  jid = vim.fn.jobstart(cmd, {
     stdout_buffered = true,
     stderr_buffered = true,
     on_stdout = function(_, data)
@@ -147,6 +149,15 @@ local function make_request(messages, callback)
       end
     end,
     on_exit = function(_, exit_code)
+      if not loading.is_active() then
+        cancelled = true
+      end
+
+      if cancelled then
+        loading.stop()
+        return
+      end
+
       local stderr_text = table.concat(stderr_chunks, "\n")
 
       if exit_code ~= 0 then
@@ -203,6 +214,8 @@ local function make_request(messages, callback)
 
   if jid <= 0 then
     loading.error("failed to start curl — is it installed?")
+  else
+    loading.set_job(jid)
   end
 end
 

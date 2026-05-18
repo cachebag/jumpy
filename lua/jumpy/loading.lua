@@ -9,6 +9,7 @@ local frame_idx = 1
 local start_time = 0
 local win
 local buf
+local current_job_id = nil
 
 local function close_ui()
   if win and vim.api.nvim_win_is_valid(win) then
@@ -104,6 +105,22 @@ function M.stop()
     timer = nil
   end
   close_ui()
+  current_job_id = nil
+end
+
+function M.cancel()
+  if current_job_id and vim.fn.jobwait({ current_job_id }, 0)[1] == -1 then
+    vim.fn.jobstop(current_job_id)
+  end
+  M.stop()
+end
+
+function M.set_job(jid)
+  current_job_id = jid
+end
+
+function M.is_active()
+  return active
 end
 
 function M.error(msg)
