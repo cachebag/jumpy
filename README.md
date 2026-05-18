@@ -1,13 +1,14 @@
-# jumpy
+# <p align="center"> jumpy
 
-Inspired by [99](https://github.com/ThePrimeagen/99.git), I, like Prime, wanted a tool to allow for _me_ to still be in the driver seat if I am going to spawn an AI to edit my code.
+Inspired by [99](https://github.com/ThePrimeagen/99.git): I, like Prime, wanted a tool to allow for _me_ to still be in the driver seat if I am going to spawn an AI to edit my code.
+
+<br>
 
 <img width="1799" height="1029" alt="image" src="https://github.com/user-attachments/assets/dcdd4b2a-49a6-47ed-93e0-618b3b07b324" />
 
 <img width="1798" height="1031" alt="image" src="https://github.com/user-attachments/assets/70913693-98c1-464f-a256-3c7d8b3980e7" />
 
-
-
+<br>
 
 The main difference between jumpy and other tools, like 99, are:
 
@@ -22,7 +23,9 @@ The main difference between jumpy and other tools, like 99, are:
 
 Some of these are to be fleshed out, but the sole purpose is to know exactly what I am letting the LLM write into my code. I have no interest in letting it change everything, and only _then_ can I go back and review every change.
 
-That being said, I don't know wtf I'm doing, and right now, this really doesn't work very well. 
+So the philosophy here is: yes, I still want to handwrite my code _AND_ use AI, but I prefer that I have _full_ control over what the AI is writing. I don't want to have to wait until it finishes in order to review its changes.
+
+That being said, **I don't know wtf I'm doing**, and right now, this really doesn't work very well. 
 
 But hopefully it will soon :P 
 
