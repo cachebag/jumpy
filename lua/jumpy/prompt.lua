@@ -131,10 +131,19 @@ function M._submit()
 
     llm.request(context, function(response_text)
       vim.schedule(function()
+        if not vim.api.nvim_buf_is_valid(source_buf) then
+          vim.notify("jumpy: buffer closed, discarding response", vim.log.levels.WARN)
+          return
+        end
+
         local diff = require("jumpy.diff")
         local render = require("jumpy.render")
+        local patch = require("jumpy.patch")
 
-        local proposed_lines = vim.split(response_text, "\n", { trimempty = false })
+        local proposed_lines, unmatched = patch.apply(source_lines, response_text)
+        if unmatched > 0 then
+          vim.notify(string.format("jumpy: %d block(s) could not be matched", unmatched), vim.log.levels.WARN)
+        end
         local hunks = diff.compute(source_lines, proposed_lines)
 
         if #hunks == 0 then
