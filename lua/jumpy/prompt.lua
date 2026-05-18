@@ -98,7 +98,6 @@ function M._submit()
   local reprompt_idx = state.reprompt_hunk_idx
 
   local llm = require("jumpy.llm")
-  vim.notify("jumpy: thinking...", vim.log.levels.INFO)
 
   if reprompt_idx then
     local render = require("jumpy.render")

@@ -84,7 +84,8 @@ local function make_request(messages, callback)
   local config = get_config()
 
   if not config.api_key or config.api_key == "" then
-    vim.notify("jumpy: no API key configured. Set the appropriate env var or pass api_key in setup()", vim.log.levels.ERROR)
+    local loading = require("jumpy.loading")
+    loading.error("no API key — set " .. (config.provider or "JUMPY") .. " env var or pass api_key in setup()")
     return
   end
 
@@ -122,9 +123,13 @@ local function make_request(messages, callback)
   end
 
   local response_chunks = {}
+  local stderr_chunks = {}
+  local loading = require("jumpy.loading")
+  loading.start()
 
-  vim.fn.jobstart(cmd, {
+  local jid = vim.fn.jobstart(cmd, {
     stdout_buffered = true,
+    stderr_buffered = true,
     on_stdout = function(_, data)
       if data then
         for _, line in ipairs(data) do
@@ -132,10 +137,25 @@ local function make_request(messages, callback)
         end
       end
     end,
+    on_stderr = function(_, data)
+      if data then
+        for _, line in ipairs(data) do
+          if line ~= "" then
+            table.insert(stderr_chunks, line)
+          end
+        end
+      end
+    end,
     on_exit = function(_, exit_code)
+      local stderr_text = table.concat(stderr_chunks, "\n")
+
       if exit_code ~= 0 then
         vim.schedule(function()
-          vim.notify("jumpy: request failed (curl exit " .. exit_code .. ")", vim.log.levels.ERROR)
+          local msg = "request failed (curl exit " .. exit_code .. ")"
+          if stderr_text ~= "" then
+            msg = msg .. " — " .. stderr_text
+          end
+          loading.error(msg)
         end)
         return
       end
@@ -145,15 +165,17 @@ local function make_request(messages, callback)
 
       if not ok then
         vim.schedule(function()
-          vim.notify("jumpy: failed to parse response", vim.log.levels.ERROR)
+          local preview = vim.fn.strcharpart(vim.fn.substitute(raw, "\n", " ", "g"), 0, 120)
+          loading.error("response was not JSON: " .. preview)
         end)
         return
       end
 
       if parsed.error then
         vim.schedule(function()
-          local msg = parsed.error.message or vim.inspect(parsed.error)
-          vim.notify("jumpy: API error: " .. msg, vim.log.levels.ERROR)
+          local err = parsed.error
+          local msg = type(err) == "table" and (err.message or vim.inspect(err)) or tostring(err)
+          loading.error("API error: " .. msg)
         end)
         return
       end
@@ -167,16 +189,21 @@ local function make_request(messages, callback)
 
       if not content then
         vim.schedule(function()
-          vim.notify("jumpy: empty response from LLM", vim.log.levels.ERROR)
+          loading.error("empty response from LLM (check model / response shape)")
         end)
         return
       end
 
+      loading.stop()
       content = content:gsub("^```[%w]*\n", ""):gsub("\n```%s*$", "")
 
       callback(content)
     end,
   })
+
+  if jid <= 0 then
+    loading.error("failed to start curl — is it installed?")
+  end
 end
 
 function M.request(context, callback)
