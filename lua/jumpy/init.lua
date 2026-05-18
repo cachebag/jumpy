@@ -5,7 +5,8 @@ M.config = {
   endpoint = nil,
   model = nil,
   api_key = nil,
-  system_prompt = [[You are a code editor. The user will give you a file and an instruction. Return ONLY the complete modified file contents. Do not wrap in markdown code fences. Do not explain.]],
+  system_prompt = [[You are a code editor. The user will give you a file and an instruction. ]]
+    .. [[Return ONLY the complete modified file contents. Do not wrap in markdown code fences. Do not explain.]],
   keymaps = {
     prompt = "<leader>j",
     next_hunk = "]h",
@@ -80,14 +81,30 @@ function M._setup_keymaps()
   local opts = { silent = true }
   local c = M.config.keymaps
 
-  map("n", c.prompt, function() require("jumpy.prompt").open() end, opts)
-  map("n", c.next_hunk, function() require("jumpy.navigate").next_hunk() end, opts)
-  map("n", c.prev_hunk, function() require("jumpy.navigate").prev_hunk() end, opts)
-  map("n", c.accept, function() require("jumpy.navigate").accept() end, opts)
-  map("n", c.reject, function() require("jumpy.navigate").reject() end, opts)
-  map("n", c.accept_all, function() require("jumpy.navigate").accept_all() end, opts)
-  map("n", c.reject_all, function() require("jumpy.navigate").reject_all() end, opts)
-  map("n", c.reprompt, function() require("jumpy.prompt").reprompt() end, opts)
+  map("n", c.prompt, function()
+    require("jumpy.prompt").open()
+  end, opts)
+  map("n", c.next_hunk, function()
+    require("jumpy.navigate").next_hunk()
+  end, opts)
+  map("n", c.prev_hunk, function()
+    require("jumpy.navigate").prev_hunk()
+  end, opts)
+  map("n", c.accept, function()
+    require("jumpy.navigate").accept()
+  end, opts)
+  map("n", c.reject, function()
+    require("jumpy.navigate").reject()
+  end, opts)
+  map("n", c.accept_all, function()
+    require("jumpy.navigate").accept_all()
+  end, opts)
+  map("n", c.reject_all, function()
+    require("jumpy.navigate").reject_all()
+  end, opts)
+  map("n", c.reprompt, function()
+    require("jumpy.prompt").reprompt()
+  end, opts)
 end
 
 return M

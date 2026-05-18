@@ -21,8 +21,12 @@ end
 
 local function build_reprompt_messages(context)
   local config = get_config()
+  local template = "File type: %s\n\n"
+    .. "--- ORIGINAL LINES ---\n%s\n--- END ORIGINAL ---\n\n"
+    .. "--- PREVIOUSLY PROPOSED (rejected) ---\n%s\n--- END PROPOSED ---\n\n"
+    .. "New instruction: %s\n\nReturn ONLY the replacement lines. No explanation, no fences."
   local user_content = string.format(
-    "File type: %s\n\n--- ORIGINAL LINES ---\n%s\n--- END ORIGINAL ---\n\n--- PREVIOUSLY PROPOSED (rejected) ---\n%s\n--- END PROPOSED ---\n\nNew instruction: %s\n\nReturn ONLY the replacement lines. No explanation, no fences.",
+    template,
     context.filetype or "text",
     table.concat(context.original_lines, "\n"),
     table.concat(context.proposed_lines, "\n"),
@@ -42,30 +46,36 @@ end
 
 local function build_curl_cmd_openai(body_json, config)
   return {
-    "curl", "-s",
-    "-H", "Content-Type: application/json",
-    "-H", string.format("Authorization: Bearer %s", config.api_key),
-    "-d", body_json,
+    "curl",
+    "-s",
+    "-H",
+    "Content-Type: application/json",
+    "-H",
+    string.format("Authorization: Bearer %s", config.api_key),
+    "-d",
+    body_json,
     config.endpoint,
   }
 end
 
 local function build_curl_cmd_anthropic(body_json, config)
   return {
-    "curl", "-s",
-    "-H", "Content-Type: application/json",
-    "-H", string.format("x-api-key: %s", config.api_key),
-    "-H", "anthropic-version: 2023-06-01",
-    "-d", body_json,
+    "curl",
+    "-s",
+    "-H",
+    "Content-Type: application/json",
+    "-H",
+    string.format("x-api-key: %s", config.api_key),
+    "-H",
+    "anthropic-version: 2023-06-01",
+    "-d",
+    body_json,
     config.endpoint,
   }
 end
 
 local function extract_content_openai(parsed)
-  return parsed.choices
-    and parsed.choices[1]
-    and parsed.choices[1].message
-    and parsed.choices[1].message.content
+  return parsed.choices and parsed.choices[1] and parsed.choices[1].message and parsed.choices[1].message.content
 end
 
 local function extract_content_anthropic(parsed)

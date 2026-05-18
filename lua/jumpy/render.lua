@@ -51,10 +51,7 @@ function M.show(bufnr, hunks, original_lines, proposed_lines)
         table.insert(virt_lines, { { added_line, "JumpyAdded" } })
       end
 
-      local anchor_line = math.min(
-        hunk.old_start - 1 + hunk.old_count - 1,
-        vim.api.nvim_buf_line_count(bufnr) - 1
-      )
+      local anchor_line = math.min(hunk.old_start - 1 + hunk.old_count - 1, vim.api.nvim_buf_line_count(bufnr) - 1)
       anchor_line = math.max(0, anchor_line)
 
       local id = vim.api.nvim_buf_set_extmark(bufnr, ns, anchor_line, 0, {
@@ -103,10 +100,14 @@ end
 
 function M.clear_hunk(bufnr, hunk_idx)
   local state = buf_states[bufnr]
-  if not state then return end
+  if not state then
+    return
+  end
 
   local hunk = state.hunks[hunk_idx]
-  if not hunk then return end
+  if not hunk then
+    return
+  end
 
   for _, eid in ipairs(hunk.extmarks) do
     vim.api.nvim_buf_del_extmark(bufnr, ns, eid)
@@ -130,10 +131,14 @@ end
 
 function M.update_hunk_lines(bufnr, hunk_idx, new_added_lines)
   local state = buf_states[bufnr]
-  if not state then return end
+  if not state then
+    return
+  end
 
   local hunk = state.hunks[hunk_idx]
-  if not hunk then return end
+  if not hunk then
+    return
+  end
 
   for _, eid in ipairs(hunk.extmarks) do
     vim.api.nvim_buf_del_extmark(bufnr, ns, eid)
@@ -162,10 +167,7 @@ function M.update_hunk_lines(bufnr, hunk_idx, new_added_lines)
 
     local anchor_line
     if hunk.old_count > 0 then
-      anchor_line = math.min(
-        hunk.old_start - 1 + hunk.old_count - 1,
-        vim.api.nvim_buf_line_count(bufnr) - 1
-      )
+      anchor_line = math.min(hunk.old_start - 1 + hunk.old_count - 1, vim.api.nvim_buf_line_count(bufnr) - 1)
       anchor_line = math.max(0, anchor_line)
     else
       anchor_line = math.max(0, hunk.old_start - 1)
