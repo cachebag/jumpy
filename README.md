@@ -21,16 +21,15 @@ this really doesn't work very well
 set your API key: `export ANTHROPIC_API_KEY="sk-ant-..."` (or `OPENAI_API_KEY`, `JUMPY_API_KEY` for openrouter).
 
 ## Use
-
-`<leader>j` — open prompt, type your change, hit `<CR>`
-
-`]h` / `[h` — next / prev hunk
-
-`<leader>a` — accept hunk · `<leader>x` — reject hunk
-
-`<leader>A` — accept all · `<leader>X` — reject all
-
-`<leader>r` — reprompt the hunk under cursor
+| Keybind     | Action                                    |
+| ----------- | ----------------------------------------- |
+| `<leader>j` | Open prompt, type your change, hit `<CR>` |
+| `]h` / `[h` | Next / previous hunk                      |
+| `<leader>a` | Accept hunk                               |
+| `<leader>x` | Reject hunk                               |
+| `<leader>A` | Accept all hunks                          |
+| `<leader>X` | Reject all hunks                          |
+| `<leader>r` | Reprompt the hunk under cursor            |
 
 ## License
 
