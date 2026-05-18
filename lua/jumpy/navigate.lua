@@ -4,7 +4,9 @@ local render = require("jumpy.render")
 
 local function get_active_hunks(bufnr)
   local state = render.get_state(bufnr)
-  if not state then return {} end
+  if not state then
+    return {}
+  end
 
   local active = {}
   for idx, hunk in pairs(state.hunks) do
@@ -167,7 +169,9 @@ function M._apply_offset(bufnr, accepted_idx, delta)
   end
 
   local state = render.get_state(bufnr)
-  if not state then return end
+  if not state then
+    return
+  end
 
   for idx, hunk in pairs(state.hunks) do
     if hunk and idx > accepted_idx then

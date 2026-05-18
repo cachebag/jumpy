@@ -86,14 +86,18 @@ function M.start()
   open_float(text)
 
   timer = vim.loop.new_timer()
-  timer:start(80, 80, vim.schedule_wrap(function()
-    if not active then
-      return
-    end
-    frame_idx = frame_idx % #FRAMES + 1
-    local line = string.format("  %s  waiting for model…%s  ", FRAMES[frame_idx], format_elapsed())
-    update_text(line)
-  end))
+  timer:start(
+    80,
+    80,
+    vim.schedule_wrap(function()
+      if not active then
+        return
+      end
+      frame_idx = frame_idx % #FRAMES + 1
+      local line = string.format("  %s  waiting for model…%s  ", FRAMES[frame_idx], format_elapsed())
+      update_text(line)
+    end)
+  )
 end
 
 function M.stop()
@@ -130,10 +134,14 @@ function M.error(msg)
   open_float(text)
 
   dismiss_timer = vim.loop.new_timer()
-  dismiss_timer:start(4000, 0, vim.schedule_wrap(function()
-    cancel_dismiss()
-    close_ui()
-  end))
+  dismiss_timer:start(
+    4000,
+    0,
+    vim.schedule_wrap(function()
+      cancel_dismiss()
+      close_ui()
+    end)
+  )
 end
 
 return M

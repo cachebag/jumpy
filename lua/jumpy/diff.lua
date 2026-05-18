@@ -15,8 +15,13 @@ local function myers_diff(old_lines, new_lines)
   local v = {}
   v[1] = 0
   local trace = {}
+  local done = false
 
   for d = 0, max do
+    if done then
+      break
+    end
+
     local snapshot = {}
     for k, val in pairs(v) do
       snapshot[k] = val
@@ -40,12 +45,11 @@ local function myers_diff(old_lines, new_lines)
       v[k] = x
 
       if x >= n and y >= m then
-        goto backtrack
+        done = true
+        break
       end
     end
   end
-
-  ::backtrack::
 
   local edits = {}
   local x, y = n, m
